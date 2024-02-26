@@ -6,7 +6,7 @@ from bot import Bot
 from config import ADMINS
 from helper_func import encode, get_message_id
 
-API_KEY = "your_publicearn_api_key_here"
+API_KEY = "85d2cf5838d6c742c6a855eb514af076ea5c3790"
 
 @Bot.on_message(filters.private & filters.user(ADMINS) & filters.command('genlink'))
 async def link_generator(client: Client, message: Message):
