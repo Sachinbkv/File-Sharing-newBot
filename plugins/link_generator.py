@@ -1,6 +1,27 @@
 from datetime import datetime, timedelta
 import requests
 
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+import os
+
+SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key_here')
+serializer = Serializer(SECRET_KEY, expires_in=3600)  # Token expires in 1 hour
+
+def generate_token(user_id):
+    return serializer.dumps({'user_id': user_id}).decode('utf-8')
+
+def validate_token(token):
+    try:
+        data = serializer.loads(token)
+        return data.get('user_id')
+    except:
+        return None
+import secrets
+import string
+
+SECRET_KEY = ''.join(secrets.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(32))
+
+
 API_KEY = "85d2cf5838d6c742c6a855eb514af076ea5c3790"
 
 @Bot.on_message(filters.private & filters.user(ADMINS) & filters.command('genlink'))
