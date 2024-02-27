@@ -1,10 +1,4 @@
 from datetime import datetime, timedelta
-
-from pyrogram import Client, filters
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from bot import Bot
-from config import ADMINS
-from helper_func import encode, get_message_id
 import requests
 
 API_KEY = "85d2cf5838d6c742c6a855eb514af076ea5c3790"
@@ -38,9 +32,13 @@ async def link_generator(client: Client, message: Message):
                                          quote=True)
             continue
 
+    # Generate token
+    user_id = message.from_user.id
+    token = generate_token(user_id)
+
     if use_api:
         base64_string = await encode(f"get-{msg_id * abs(client.db_channel.id)}")
-        link = f"https://t.me/{client.username}?start={base64_string}"
+        link = f"https://t.me/{client.username}?start={base64_string}&token={token}"
         alias = "CustomAlias"
         format_type = "text"
         api_url = f"https://publicearn.com/api?api={API_KEY}&url={link}&alias={alias}&format={format_type}"
@@ -51,7 +49,16 @@ async def link_generator(client: Client, message: Message):
             link = data["shortenedUrl"]
     else:
         base64_string = await encode(f"get-{msg_id * abs(client.db_channel.id)}")
-        link = f"https://t.me/{client.username}?start={base64_string}"
+        link = f"https://t.me/{client.username}?start={base64_string}&token={token}"
 
+    # Verify the token using the API
+    verify_api_url = f"https://publicearn.com/api/verify?api={API_KEY}&token={token}"
+    verify_response = requests.get(verify_api_url)
+    verify_response_data = verify_response.json()
+    if verify_response_data["status"] != "success":
+        await channel_message.reply_text("❌ Error\n\nToken verification failed. Link cannot be accessed.", quote=True)
+        return
+
+    # If token verification is successful, send the link to the user
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔁 Share URL", url=f'https://telegram.me/share/url?url={link}')]])
     await channel_message.reply_text(f"<b>Here is your link</b>\n\n{link}", quote=True, reply_markup=reply_markup)
