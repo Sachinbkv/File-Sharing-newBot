@@ -6,6 +6,10 @@
 import pymongo, os
 from config import DB_URI, DB_NAME
 
+async def update_last_api_call(user_id: int, last_api_call: datetime):
+    user_data.update_one({'_id': user_id}, {'$set': {'last_api_call': last_api_call}})
+    return
+
 
 dbclient = pymongo.MongoClient(DB_URI)
 database = dbclient[DB_NAME]
