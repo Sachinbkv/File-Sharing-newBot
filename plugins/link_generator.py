@@ -5,6 +5,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from bot import Bot
 from config import ADMINS
 from helper_func import encode, get_message_id
+import requests
 
 API_KEY = "85d2cf5838d6c742c6a855eb514af076ea5c3790"
 
