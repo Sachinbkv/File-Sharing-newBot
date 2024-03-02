@@ -23,7 +23,7 @@ class Bot(Client):
             bot_token=TG_BOT_TOKEN
         )
         self.LOGGER = LOGGER
-        self.limiter = AsyncLimiter(rate_limit=1014, period=1)  # Rate limit of 1 action per second
+        self.limiter = AsyncLimiter(period=1014)  # Rate limit of 1 action per second
 
     async def start(self):
         async with self.limiter:
